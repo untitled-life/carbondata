@@ -57,25 +57,25 @@ public class CarbonReaderExample {
             fields[9] = new Field("varcharField", DataTypes.VARCHAR);
             fields[10] = new Field("arrayField", DataTypes.createArrayType(DataTypes.STRING));
             CarbonWriter writer = CarbonWriter.builder()
-                .outputPath(path)
-                .withLoadOption("complex_delimiter_level_1", "#")
-                .withCsvInput(new Schema(fields))
-                .writtenBy("CarbonReaderExample")
-                .build();
+                    .outputPath(path)
+                    .withLoadOption("complex_delimiter_level_1", "#")
+                    .withCsvInput(new Schema(fields))
+                    .writtenBy("CarbonReaderExample")
+                    .build();
 
             for (int i = 0; i < 10; i++) {
                 String[] row2 = new String[]{
-                    "robot" + (i % 10),
-                    String.valueOf(i%10000),
-                    String.valueOf(i),
-                    String.valueOf(Long.MAX_VALUE - i),
-                    String.valueOf((double) i / 2),
-                    String.valueOf(true),
-                    "2019-03-02",
-                    "2019-02-12 03:03:34",
-                    "12.345",
-                    "varchar",
-                    "Hello#World#From#Carbon"
+                        "robot" + (i % 10),
+                        String.valueOf(i % 10000),
+                        String.valueOf(i),
+                        String.valueOf(Long.MAX_VALUE - i),
+                        String.valueOf((double) i / 2),
+                        String.valueOf(true),
+                        "2019-03-02",
+                        "2019-02-12 03:03:34",
+                        "12.345",
+                        "varchar",
+                        "Hello#World#From#Carbon"
                 };
                 writer.write(row2);
             }
@@ -94,8 +94,8 @@ public class CarbonReaderExample {
                 throw new RuntimeException("Carbon index file not exists.");
             }
             Schema schema = CarbonSchemaReader
-                .readSchema(dataFiles[0].getAbsolutePath())
-                .asOriginOrder();
+                    .readSchema(dataFiles[0].getAbsolutePath())
+                    .asOriginOrder();
             // Transform the schema
             String[] strings = new String[schema.getFields().length];
             for (int i = 0; i < schema.getFields().length; i++) {
@@ -104,9 +104,9 @@ public class CarbonReaderExample {
 
             // Read data
             CarbonReader reader = CarbonReader
-                .builder(path, "_temp")
-                .projection(strings)
-                .build();
+                    .builder(path, "_temp")
+                    .projection(strings)
+                    .build();
 
             System.out.println("\nData:");
             long day = 24L * 3600 * 1000;
@@ -114,9 +114,9 @@ public class CarbonReaderExample {
             while (reader.hasNext()) {
                 Object[] row = (Object[]) reader.readNextRow();
                 System.out.println(String.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t",
-                    i, row[0], row[1], row[2], row[3], row[4], row[5],
-                    new Date((day * ((int) row[6]))), new Timestamp((long) row[7] / 1000),
-                    row[8], row[9]
+                        i, row[0], row[1], row[2], row[3], row[4], row[5],
+                        new Date((day * ((int) row[6]))), new Timestamp((long) row[7] / 1000),
+                        row[8], row[9]
                 ));
                 Object[] arr = (Object[]) row[10];
                 for (int j = 0; j < arr.length; j++) {
@@ -131,22 +131,22 @@ public class CarbonReaderExample {
 
             // Read data
             CarbonReader reader2 = CarbonReader
-                .builder(path, "_temp")
-                .build();
+                    .builder(path, "_temp")
+                    .build();
 
             System.out.println("\nData:");
             i = 0;
             while (reader2.hasNext()) {
                 Object[] row = (Object[]) reader2.readNextRow();
                 System.out.print(String.format("%s\t%s\t%s\t%s\t%s\t",
-                    i, row[0], new Date((day * ((int) row[1]))), new Timestamp((long) row[2] / 1000),
-                    row[3]));
+                        i, row[0], new Date((day * ((int) row[1]))), new Timestamp((long) row[2] / 1000),
+                        row[3]));
                 Object[] arr = (Object[]) row[4];
                 for (int j = 0; j < arr.length; j++) {
                     System.out.print(arr[j] + " ");
                 }
                 System.out.println(String.format("\t%s\t%s\t%s\t%s\t%s\t%s\t",
-                    row[5], row[6], row[7], row[8], row[9], row[10]));
+                        row[5], row[6], row[7], row[8], row[9], row[10]));
                 i++;
             }
             reader2.close();
@@ -154,6 +154,14 @@ public class CarbonReaderExample {
         } catch (Throwable e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
+            // When an exception occurs, remember to delete the created file.
+            try {
+                FileUtils.deleteDirectory(new File(path));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.out.println(ex.getMessage());
+            }
+
         }
     }
 }
